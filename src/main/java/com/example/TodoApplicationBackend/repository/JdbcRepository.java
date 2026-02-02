@@ -5,10 +5,30 @@ import com.example.TodoApplicationBackend.todoDto.TodoDto;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
+
+
+class TodoRowMapper implements RowMapper<TodoDto> {
+
+
+    @Override
+    public TodoDto mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+        TodoDto todo = new TodoDto();
+        todo.setId(rs.getInt("id"));
+        todo.setTitle(rs.getString("title"));
+        todo.setDescription(rs.getString("description"));
+        todo.setIsCompleted(rs.getBoolean("isCompleted"));
+        return todo;
+    }
+}
 @Repository
 public class JdbcRepository implements TodoMethods {
 
@@ -31,8 +51,8 @@ public class JdbcRepository implements TodoMethods {
     public TodoDto findTodoById(Long id) {
         try {
             String sql = "SELECT * FROM todos WHERE id=?";
-            TodoDto todoDto = jdbcTemplate.queryForObject(sql, BeanPropertyRowMapper.newInstance(TodoDto.class), id);
-            return todoDto;
+            TodoDto todo = jdbcTemplate.queryForObject(sql, new TodoRowMapper() , id);
+            return todo;
         }catch(IncorrectResultSizeDataAccessException e) {
             return null;
         }
