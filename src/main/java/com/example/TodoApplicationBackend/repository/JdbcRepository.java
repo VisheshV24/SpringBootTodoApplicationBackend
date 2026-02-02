@@ -15,7 +15,7 @@ import java.util.List;
 
 
 
-class TodoRowMapper implements RowMapper<TodoDto> {
+class CustomRowMapper implements RowMapper<TodoDto> {
 
 
     @Override
@@ -43,7 +43,7 @@ public class JdbcRepository implements TodoMethods {
     public List<TodoDto> findAllTodos() {
 
         String sql = "SELECT * FROM todos";
-        return jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(TodoDto.class));
+        return jdbcTemplate.query(sql, new CustomRowMapper());
 
     }
 
@@ -51,7 +51,7 @@ public class JdbcRepository implements TodoMethods {
     public TodoDto findTodoById(Long id) {
         try {
             String sql = "SELECT * FROM todos WHERE id=?";
-            TodoDto todo = jdbcTemplate.queryForObject(sql, new TodoRowMapper() , id);
+            TodoDto todo = jdbcTemplate.queryForObject(sql, new CustomRowMapper() , id);
             return todo;
         }catch(IncorrectResultSizeDataAccessException e) {
             return null;
